@@ -1,24 +1,21 @@
 import os
-import requests
 import gradio as gr
+from huggingface_hub import InferenceClient
 
 # =====================================================================
-# CONFIGURATION (Change these to match your account)
+# CONFIGURATION
 # =====================================================================
-# Replace with your actual Hugging Face username and the Model Repository name
+# Replace with your actual Hugging Face details
 HF_MODEL_REPO = "BabalolaEpo/physics-model"
+HF_API_TOKEN = "hf_your_token_here"  # Paste your copied token here
 
-# Replace with your free Hugging Face Access Token (Read token)
-HF_API_TOKEN = "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"
-
-API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL_REPO}"
-headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+# Initialize the official client (handles DNS and routing automatically)
+client = InferenceClient(model=HF_MODEL_REPO, token=HF_API_TOKEN)
 
 # =====================================================================
 # CORE AI INFERENCE LOGIC
 # =====================================================================
 def ask_physics_agent(user_message, history):
-    # This keeps your exact Alpaca template formatting intact
     alpaca_prompt = """Below is an instruction that describes a task. Write a response that appropriately completes the request.
 
 ### Instruction:
@@ -28,32 +25,17 @@ def ask_physics_agent(user_message, history):
 """
     formatted_prompt = alpaca_prompt.format(user_message)
     
-    payload = {
-        "inputs": formatted_prompt,
-        "parameters": {
-            "max_new_tokens": 512,
-            "temperature": 0.3,
-            "return_full_text": False
-        }
-    }
-    
     try:
-        response = requests.post(API_URL, headers=headers, json=payload)
-        output = response.json()
-        
-        # Handle model loading or processing states smoothly
-        if isinstance(output, list) and len(output) > 0:
-            return output[0].get("generated_text", "No response text found.")
-        elif isinstance(output, dict):
-            if "generated_text" in output:
-                return output["generated_text"]
-            elif "error" in output:
-                return f"Hugging Face Status: {output['error']}"
-        
-        return f"Unexpected API output format: {str(output)}"
+        # Using the official client method to avoid hardcoded URL errors
+        response = client.text_generation(
+            formatted_prompt,
+            max_new_tokens=512,
+            temperature=0.3
+        )
+        return response
         
     except Exception as e:
-        return f"Connection error: {str(e)}"
+        return f"Backend Connection Error: {str(e)}\n\n(If this persists, make sure your weights folder is completely uploaded to the repository!)"
 
 # =====================================================================
 # GRADIO INTERFACE CONFIGURATION
@@ -66,6 +48,5 @@ demo = gr.ChatInterface(
 )
 
 if __name__ == "__main__":
-    # Render requires the app to look specifically at 0.0.0.0 and port 7860
     demo.launch(server_name="0.0.0.0", server_port=7860)
     
