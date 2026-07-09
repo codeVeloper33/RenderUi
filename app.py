@@ -6,7 +6,8 @@ from huggingface_hub import InferenceClient
 # CONFIGURATION
 # =====================================================================
 # Replace with your actual Hugging Face details
-HF_MODEL_REPO = "BabalolaEpo/physics-model"
+# Change this line from "physics-model" to your actual repository name:
+HF_MODEL_REPO = "BabalolaEpo/physics-lora-weights"
 HF_API_TOKEN = "hf_your_token_here"  # Paste your copied token here
 
 # Initialize the official client (handles DNS and routing automatically)
