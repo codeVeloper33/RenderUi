@@ -6,7 +6,7 @@ import gradio as gr
 # CONFIGURATION (Change these to match your account)
 # =====================================================================
 # Replace with your actual Hugging Face username and the Model Repository name
-HF_MODEL_REPO = "YOUR_HF_USERNAME/YOUR_MODEL_REPO_NAME"
+HF_MODEL_REPO = "BabalolaEpo/physics-model"
 
 # Replace with your free Hugging Face Access Token (Read token)
 HF_API_TOKEN = "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"
